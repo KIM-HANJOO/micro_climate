@@ -87,65 +87,64 @@ def unite_para_time(excel) :
             time_saved = column
 
     for num_index, index in enumerate(range(excel.shape[0])) :
-        if num_index < 3 :
-            excel.loc[index, time_sent] = unite_para_time_unit(excel.loc[index, time_sent])
-            
-            excel.loc[index, time_saved] = unite_para_time_unit(excel.loc[index, time_sent])
-            print(f'{index} done', end = '\r')
+        excel.loc[index, time_sent] = unite_para_time_unit(excel.loc[index, time_sent])
+        excel.loc[index, time_saved] = unite_para_time_unit(excel.loc[index, time_sent])
+        print(f'{index} done', end = '\r')
 
     return excel
 
 
 def unite_para_time_unit(string) :
     string = str(string)
+    string_old = string
 
     split_list = []
 
     # for format "2020.4.1 1:00"
     if ':' in string :
         if '.' in string :
-#            print("format 2020.4.1 1:00")
-            
-            string_left = string
-            for itera in range(2) :
-                target_string = '.'
-                temp_left = string_left[ : string_left.index(target_string)]
-                temp_right = string_left[ string_left.index(target_string) + 1 :]
-
-                if len(temp_left) == 1 :
-                    temp_left = '0' + temp_left
-
-                split_list.append(temp_left)
-                string_left = temp_right
-            
-            for itera in range(1) :
-                target_string = ' '
-                temp_left = string_left[ : string_left.index(target_string)]
-                temp_right = string_left[ string_left.index(target_string) + 1 :]
-
-                if len(temp_left) == 1 :
-                    temp_left = '0' + temp_left
-
-                split_list.append(temp_left)
-                string_left = temp_right
+            if ('PM' not in string) & ('AM' not in string) :
+#               print("format 2020.4.1 1:00")
                 
+                string_left = string
 
-            for itera in range(1) :
-                target_string = ':'
-                temp_left = string_left[ : string_left.index(target_string)]
-                temp_right = string_left[ string_left.index(target_string) + 1 :]
+                # convert '2020.4.'
+                for itera in range(2) :
+                    target_string = '.'
+                    temp_left = string_left[ : string_left.index(target_string)]
+                    temp_right = string_left[ string_left.index(target_string) + 1 :]
 
-                if len(temp_left) == 1 :
-                    temp_left = '0' + temp_left
+                    if len(temp_left) == 1 :
+                        temp_left = '0' + temp_left
 
-                split_list.append(temp_left)
-                string_left = temp_right
+                    split_list.append(temp_left)
+                    string_left = temp_right
+                
+                # convert '1 '
+                for itera in range(1) :
+                    target_string = ' '
+                    temp_left = string_left[ : string_left.index(target_string)]
+                    temp_right = string_left[ string_left.index(target_string) + 1 :]
 
-            # for left
-            split_list.append(string_left)
+                    split_list.append(double_size(temp_left))
+                    string_left = temp_right
+                    
+                # convert '1:'
+                for itera in range(1) :
+                    target_string = ':'
+                    temp_left = string_left[ : string_left.index(target_string)]
+                    temp_right = string_left[ string_left.index(target_string) + 1 :]
+
+                    split_list.append(double_size(temp_left))
+                    string_left = temp_right
+
+                # for left ('00')
+                split_list.append(double_size(string_left))
+
+                print(f'{string_old}\t->\t{"".join(split_list)}')
 
     else :
-        print(string, '\n')
+        print(string)
 
     return ''.join(split_list)
 
@@ -173,9 +172,32 @@ class NotAvailableError(Exception) :
     def __init__(self) :
         super().__init__('not available!') 
 
+def date_availability(string) :
+
+    available = 0 # 0 means available
+
+#    print(string[4 : 6])
+#    print(string[6 : 8])
+    if string[4 : 6] == '00' :
+        available = 1
+
+    if string[6 : 8] == '00' :
+        available = 1
+
+    if available == 0 :
+        return True
+    else :
+        return False
+
+
 # -----------------------------------------------
 # unite transmission time format
 # -----------------------------------------------
+
+# type of formats
+
+# 2021-10-03 5:03
+# 2021-10-03 23:03:10 PM
 
 a = input('unite format of transmission time? (y/n)')
 
@@ -208,4 +230,50 @@ if a == 'y' :
 a = input('check sample datas percentage of null-written transmission times? (y/n)')
 
 if a == 'y' :
+    df_date = pd.DataFrame(columns = ['excel', 'all_date', 'available', 'non-available', 'starting', 'ending'])
+    num_date = 0
     
+    num_all = len(os.listdir(sample_time))
+    for num_excel, excel in enumerate(os.listdir(sample_time)) :
+        os.chdir(sample_time)
+        temp = read_excel(excel)
+
+        date_list = [str(x) for x in temp.loc[:, '전송시간']]
+        
+        print(date_list)
+        available_date = []
+
+        true = 0
+        false = 0
+
+        for date in date_list :
+            if ('PM' in date) | ('AM' in date) :
+                print('$$$$$$$$$\n' * 100)
+
+            if date_availability(str(date)) :
+                if str(date) == 'nan' :
+                    false += 1
+                else :
+
+                    true += 1
+                    available_date.append(date)
+
+            else :
+                false += 1
+
+        if len(available_date) != 0 :
+            available_date = sorted(available_date)
+            df_date.loc[num_date, :] = [excel, temp.shape[0], true, false, available_date[0], available_date[-1]]
+        else :
+            df_date.loc[num_date, :] = [excel, temp.shape[0], true, false, 'not available', 'not available']
+
+        num_date += 1
+
+        print(f'{num_excel} / {num_all}')
+
+print(df_date)
+os.chdir(sample_plot)
+df_date.to_excel('date_availability_forsampels.xlsx')
+
+
+
