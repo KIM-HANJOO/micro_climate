@@ -11,7 +11,7 @@ sample_info = os.path.join(sample_robby, 'info')
 sample_plot = os.path.join(sample_robby, 'plot')
 sample_typo = os.path.join(sample_robby, 'typo')
 sample_time = os.path.join(sample_robby, 'time')
-sample_only_time = os.path.join(sampel_robby, 'only_available_time')
+sample_only_time = os.path.join(sample_robby, 'only_available_time')
 
 main_dir = sample_robby.parent
 module_dir = os.path.join(main_dir, 'module')
@@ -200,7 +200,7 @@ def date_availability(string) :
 # 2021-10-03 5:03
 # 2021-10-03 23:03:10 PM
 
-a = input('drop nan times')
+a = input('drop nan times (y/n)')
 
 if a == 'y' :
     num_all = len(os.listdir(sample_time))
@@ -209,6 +209,8 @@ if a == 'y' :
         os.chdir(sample_time)
         temp = read_excel(excel)
 
+        temp.dropna(subset = ['전송시간'], inplace = True)
+        temp.reset_index(drop = True, inplace = True)
 
         os.chdir(sample_only_time)
         temp.to_excel(excel)
