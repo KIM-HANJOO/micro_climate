@@ -186,7 +186,10 @@ if a == 'y' :
                 else :
                     print(f'{col}\t{column_change}')
                     for index in range(temp.shape[0]) :
-                        temp.loc[index, column_change] = temp.loc[index, col]
+                        if not pd.isna(temp.loc[index, col]) :
+                            temp.loc[index, column_change] = temp.loc[index, col]
+                        else :
+                            print(f'{index} | {col}, nan')
 
         
         
