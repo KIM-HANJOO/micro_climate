@@ -120,7 +120,7 @@ merge_columns['돌풍풍향'] = ['돌풍 풍향(°)', '돌풍풍향(°)']
 merge_columns['돌풍풍속'] = ['돌풍 풍속(m/s)', '돌풍풍속(m/s)']
 merge_columns['풍향'] = ['풍향(°)', '풍향 (°)']
 merge_columns['풍속'] = ['풍속(m/s)', '풍속 (m/s)']
-merge_columns['기온'] = ['기온(℃)', '기온(℃) ', '기온 (℃)']
+merge_columns['기온'] = ['기온(℃)', '기온(℃) ', '기온 (℃)', ' 기온(℃) ']
 merge_columns['상대습도'] = ['상대습도(%)', '상대습도 (%)', '상대습도( %)']
 merge_columns['초미세먼지'] = ['초미세먼지(㎍/㎥)', '초미세먼지 (㎍/㎥)']
 merge_columns['미세먼지'] = ['미세먼지(㎍/㎥)', '미세먼지 (㎍/㎥)']
@@ -150,62 +150,63 @@ a = input('apply typo correcting to sample datas? (y/n)')
 if a == 'y' :
     all_excel = len(os.listdir(sample_data))
     for num_excel, excel in enumerate(os.listdir(sample_data)) :
-        os.chdir(sample_data)
-        temp = read_excel(excel)
+        if num_excel > 30 :
+            os.chdir(sample_data)
+            temp = read_excel(excel)
 
-        save = []
-        kill = []
+            save = []
+            kill = []
 
-        for col in temp.columns :
-            check = 0
-            for key in save_columns : 
-                if col in merge_columns[key] :
-                    check = 1
-                    break
-            
-            if check == 1 :
-                save.append(col)
-            else :
-                kill.append(col)
-
-        print(save)
-        print(kill)
-
-        print(temp.columns)
-        for col in temp.columns :
-            if col in save :
+            for col in temp.columns :
                 check = 0
                 for key in save_columns : 
                     if col in merge_columns[key] :
-                        column_change = key
                         check = 1
-
-                if check == 0 :
-                    print(f'{col}\tnot matched')
-
+                        break
+                
+                if check == 1 :
+                    save.append(col)
                 else :
-                    print(f'{col}\t{column_change}')
-                    for index in range(temp.shape[0]) :
-                        if not pd.isna(temp.loc[index, col]) :
-                            temp.loc[index, column_change] = temp.loc[index, col]
-                        else :
-                            print(f'{index} | {col}, nan')
+                    kill.append(col)
 
-        
-        
-        kill_columns = []
-        for col in temp.columns :
-            if col not in save_columns :
-                kill_columns.append(col)
+            print(save)
+            print(kill)
 
-        temp.drop(kill_columns, axis = 1, inplace = True)
-        temp.reset_index(drop = True, inplace = True)
-        
+            print(temp.columns)
+            for col in temp.columns :
+                if col in save :
+                    check = 0
+                    for key in save_columns : 
+                        if col in merge_columns[key] :
+                            column_change = key
+                            check = 1
 
-        os.chdir(sample_typo)
-        temp.to_excel(excel)
+                    if check == 0 :
+                        print(f'{col}\tnot matched')
 
-        print(f'{num_excel} / {all_excel}\t{round((num_excel / all_excel) * 100, 2)}%\t{len(temp.columns)}')
+                    else :
+                        print(f'{col}\t{column_change}')
+                        for index in range(temp.shape[0]) :
+                            if not pd.isna(temp.loc[index, col]) :
+                                temp.loc[index, column_change] = temp.loc[index, col]
+                            else :
+                                print(f'{index} | {col}, nan')
+
+            
+            
+            kill_columns = []
+            for col in temp.columns :
+                if col not in save_columns :
+                    kill_columns.append(col)
+
+            temp.drop(kill_columns, axis = 1, inplace = True)
+            temp.reset_index(drop = True, inplace = True)
+            
+
+            os.chdir(sample_typo)
+            temp.to_excel(excel)
+
+            print(f'{num_excel} / {all_excel}\t{round((num_excel / all_excel) * 100, 2)}%\t{len(temp.columns)}')
 
 
                 
