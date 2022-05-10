@@ -1,0 +1,19 @@
+check_rmtypo
+	전송시간 등록일자 포맷 동일하게
+	사용가능한 시간정보 비율 확인
+
+remove_typos
+	가지고 있는 정보 (컬럼명, 수)
+	컬럼명 오타 제거하고 사용할 것만 묶어냄
+	교정 후 컬럼명, 수 확인
+
+
+only_available_time
+	각 정보마다 null values 비율 확인
+
+barplot_information
+	가능한 데이터 플로팅
+	각 정보마다 barplot
+	
+plot_individual_informations
+	각각의 정보 플로팅 (온도 - linegraph, 바람 - x, y ..)

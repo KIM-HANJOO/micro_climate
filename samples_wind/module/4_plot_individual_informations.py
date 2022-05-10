@@ -186,6 +186,7 @@ sample_info = os.path.join(sample_robby, 'info')
 sample_plot = os.path.join(sample_robby, 'plot')
 sample_typo = os.path.join(sample_robby, 'typo')
 sample_avail = os.path.join(sample_robby, 'only_available_time')
+sample_plot = os.path.join(sample_plot, 'barplot_info')
 
 
 main_dir = sample_robby.parent
@@ -208,7 +209,7 @@ def date_to_number(regi_date) :
 
 def all_date() :
     start_date = datetime.datetime(2020, 1, 1, 00)
-    end_date = datetime.datetime(2020, 12, 31, 23)
+    end_date = datetime.datetime(2021, 12, 31, 23)
     temp_date = start_date
     index_num = 0
 
@@ -243,6 +244,9 @@ date_dict, inverse_dict = all_date()
 
 excepted = 0
 
+df = pd.DataFrame(columns = ['excel', 'date', 'hour', 'temperature', 'wind_angle', 'wind_speed', 'fine_dust'])
+df_num = 0
+
 for excel_num, excel in enumerate(os.listdir(sample_avail)) :
     os.chdir(sample_avail)
     temp = read_excel(excel)
@@ -250,12 +254,12 @@ for excel_num, excel in enumerate(os.listdir(sample_avail)) :
         #print(temp.columns)
         #print(temp.loc[: , ['등록일자', '기온']])
 
-        df = pd.DataFrame(columns = ['excel', 'date', 'hour', 'temperature', 'wind_angle', 'wind_speed', 'fine_dust'])
-        df_num = 0
         for index in range(temp.shape[0]) :
             real_date = str(temp.loc[index, '등록일자'])[4 : 8] + ' ' + str(temp.loc[index, '등록일자'])[8 : 10] + '시'
             temp_date = str(temp.loc[index, '등록일자'])[ : 10] + '00'
-            temp_num = date_dict[temp_date]
+
+            if temp_date in date_dict.keys() :
+                temp_num = date_dict[temp_date]
 
             temp_temp = float(str(temp.loc[index,'기온']).replace(',', ''))
             temp_wa = float(temp.loc[index, '풍향'])
@@ -294,13 +298,13 @@ max_date = inverse_dict[max(all_hour)]
 fig = plt.figure(figsize = (10, 7))
 
 plt.scatter(all_hour, all_temperate)
-plt.xlim(0, 8760)
+#plt.xlim(0, 8760)
 #plt.xticks(all_hour, real_date, rotation = 90)
 plt.grid()
 os.chdir(sample_plot)
 plt.title(f'temperature\n{min_date} to {max_date}')
 plt.savefig('temp_temperature_all.png', dpi = 400)
-#dlt.savefig(sample_plot, 'temp_temperature_all', 400)
+dlt.savefig(sample_plot, 'temp_temperature_all', 400)
 plt.clf()
 
 
@@ -315,14 +319,14 @@ for item in df.loc[:, 'angle'].unique() :
 
 #plt.scatter(all_wa, all_ws)
 plt.title('wind angle & speed\nx : angle, y : speed')
-plt.grid()
+#plt.grid()
 dlt.savefig(sample_plot, 'temp_was_boxplot', 400)
 plt.clf()
 
 
 
 plt.scatter(all_hour, all_wa)
-plt.xlim(0, 8760)
+#plt.xlim(0, 8760)
 #plt.xticks(all_hour, real_date, rotation = 90)
 plt.grid()
 plt.title(f'wind angle\n{min_date} to {max_date}')
@@ -330,7 +334,7 @@ dlt.savefig(sample_plot, 'temp_wa_all', 400)
 plt.clf()
 
 plt.scatter(all_hour, all_ws)
-plt.xlim(0, 8760)
+#plt.xlim(0, 8760)
 #plt.xticks(all_hour, real_date, rotation = 90)
 plt.grid()
 plt.title(f'wind speed\n{min_date} to {max_date}')
@@ -338,7 +342,7 @@ dlt.savefig(sample_plot, 'temp_ws_all', 400)
 plt.clf()
 
 plt.scatter(all_hour, all_fd)
-plt.xlim(0, 8760)
+#plt.xlim(0, 8760)
 #plt.xticks(all_hour, real_date, rotation = 90)
 plt.grid()
 plt.title(f'fine dust\n{min_date} to {max_date}')

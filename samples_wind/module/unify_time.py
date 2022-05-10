@@ -103,8 +103,9 @@ class NotAvailableError(Exception) :
 # -----------------------------------------------
 
 
+# 전송시간과 등록일자가 명시된 엑셀 파일에서 두 시간정보의 포맷 통일
+# 통일 후 포맷은 yyyymmddhhmmss (12 length string)
 def unify_time(excel) :
-
     for column in excel.columns : 
         if '전송시간' in column :
             time_sent = column
@@ -113,13 +114,14 @@ def unify_time(excel) :
             time_saved = column
 
     for num_index, index in enumerate(range(excel.shape[0])) :
-        print(f'전송시간 = {excel.loc[index, time_sent]}\t등록일자 = {excel.loc[index, time_saved]}')
+        print(f'{index}\t전송시간 = {excel.loc[index, time_sent]}\t등록일자 = {excel.loc[index, time_saved]}')
 
+        # 전송시간 format unifying
         excel.loc[index, time_sent] = unify_time_unit(excel.loc[index, time_sent])
-        
-        excel.loc[index, time_saved] = unify_time_unit(excel.loc[index, time_saved])
-        print(f'{index} done')#, end = '\r')
 
+        # 등록일자 format unifying
+        excel.loc[index, time_saved] = unify_time_unit(excel.loc[index, time_saved])
+    
     return excel
 
 
@@ -179,8 +181,13 @@ def unify_time_unit(string) :
 
                 print(f'{string_old}\t->\t{"".join(split_list)}')
 
+
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<
+    # for format "2020-4-1 13:00:02 PM"
+    # >>>>>>>>>>>>>>>>>>>>>>>>>>
+
             elif ('PM' in string) | ('AM' in string) :
-                print("format 2020-4-1 1:00 AM")
+                print("format 2020-4-1 13:01:02 PM")
                 
                 string_left = string
 
@@ -211,20 +218,20 @@ def unify_time_unit(string) :
                     temp_left = string_left[ : string_left.index(target_string)]
                     temp_right = string_left[ string_left.index(target_string) + 1 :]
 
-                    if 'PM' in string :
-                        if temp_left != '12' :
-                            temp_left = str(int(temp_left) + 12)
-
-                    elif 'AM' in string :
-                        if temp_left == '12' :
-                            temp_left = '00'
+#                    if 'PM' in string :
+#                        if temp_left != '12' :
+#                            temp_left = str(int(temp_left) - 12)
+#
+#                    elif 'AM' in string :
+#                        if temp_left == '12' :
+#                            temp_left = '00'
 
 
                     split_list.append(double_size(temp_left))
                     string_left = temp_right
 
                 # for left ('00')
-                split_list.append(double_size(string_left[ : string_left.index(' ')]))
+                split_list.append(double_size(string_left[ : string_left.index(':')][ : 2]))
 
                 print(f'{string_old}\t->\t{"".join(split_list)}')
 
@@ -273,7 +280,7 @@ def unify_time_unit(string) :
 
                 print(f'{string_old}\t->\t{"".join(split_list)}')
     # <<<<<<<<<<<<<<<<<<<<<<<<<<
-    # for format "2020.4.1 1:00 PM"
+    # for format "2020.4.1 13:00:02 PM"
     # >>>>>>>>>>>>>>>>>>>>>>>>>>
             elif ('PM' in string) | ('AM' in string) :
                 print("format 2020.4.1 1:00 AM")
@@ -307,20 +314,20 @@ def unify_time_unit(string) :
                     temp_left = string_left[ : string_left.index(target_string)]
                     temp_right = string_left[ string_left.index(target_string) + 1 :]
 
-                    if 'PM' in string :
-                        if temp_left != '12' :
-                            temp_left = str(int(temp_left) + 12)
+#                    if 'PM' in string :
+#                        if temp_left != '12' :
+#                            temp_left = str(int(temp_left) - 12)
+#
+#                    elif 'AM' in string :
+#                        if temp_left == '12' :
+#                            temp_left = '00'
 
-                    elif 'AM' in string :
-                        if temp_left == '12' :
-                            temp_left = '00'
 
-
-                    split_list.append(double_size(temp_left))
+                    split_list.append(double_size(temp_left[ : 2]))
                     string_left = temp_right
 
                 # for left ('00')
-                split_list.append(double_size(string_left[ : string_left.index(' ')]))
+                split_list.append(double_size(string_left[ : string_left.index(':')][ : 2]))
 
                 print(f'{string_old}\t->\t{"".join(split_list)}')
 
@@ -368,6 +375,10 @@ def unify_time_unit(string) :
 
                 print(f'{string_old}\t->\t{"".join(split_list)}')
 
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<
+    # for format "2020/4/1 13:00:02 PM"
+    # >>>>>>>>>>>>>>>>>>>>>>>>>>
+
             elif ('PM' in string) | ('AM' in string) :
                 print("format 2020/4/1 1:00 AM")
                 
@@ -400,20 +411,20 @@ def unify_time_unit(string) :
                     temp_left = string_left[ : string_left.index(target_string)]
                     temp_right = string_left[ string_left.index(target_string) + 1 :]
 
-                    if 'PM' in string :
-                        if temp_left != '12' :
-                            temp_left = str(int(temp_left) + 12)
-
-                    elif 'AM' in string :
-                        if temp_left == '12' :
-                            temp_left = '00'
+#                    if 'PM' in string :
+#                        if temp_left != '12' :
+#                            temp_left = str(int(temp_left) - 12)
+#
+#                    elif 'AM' in string :
+#                        if temp_left == '12' :
+#                            temp_left = '00'
 
 
                     split_list.append(double_size(temp_left))
                     string_left = temp_right
 
                 # for left ('00')
-                split_list.append(double_size(string_left[ : string_left.index(' ')]))
+                split_list.append(double_size(string_left[ : string_left.index(':')][ : 2]))
 
                 print(f'{string_old}\t->\t{"".join(split_list)}')
 
@@ -423,5 +434,8 @@ def unify_time_unit(string) :
     else :
         print("format 202004010100")
         return string
+
+    if len(''.join(split_list)) != 12 :
+        raise NotAvailableError
 
     return ''.join(split_list)

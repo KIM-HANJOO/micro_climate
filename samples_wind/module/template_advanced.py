@@ -10,6 +10,8 @@ sample_data = os.path.join(sample_robby, 'data')
 sample_info = os.path.join(sample_robby, 'info')
 sample_plot = os.path.join(sample_robby, 'plot')
 sample_typo = os.path.join(sample_robby, 'typo')
+rounded_dir = os.path.join(sample_robby, 'rounded')
+zoom_plot = os.path.join(sample_robby, 'plot_zoom')
 
 main_dir = sample_robby.parent
 module_dir = os.path.join(main_dir, 'module')

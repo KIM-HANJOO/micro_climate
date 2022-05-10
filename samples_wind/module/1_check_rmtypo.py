@@ -227,14 +227,42 @@ if a == 'y' :
 
 
 # -----------------------------------------------
+# check if any strings in register-date has ':' string inside
+# -----------------------------------------------
+
+def check_df(df) :
+    for index in range(df.shape[0]) :
+        if ':' in df.loc[index, '등록일자'] :
+            return False
+    
+    return True
+
+
+a = input('check if any dates has ":" ? (y/n)')
+
+if a == 'y' :
+    for excel in os.listdir(sample_time) :
+        os.chdir(sample_time)
+        temp = read_excel(excel)
+        if not check_df : 
+            print(excel)
+
+
+        
+        
+
+# -----------------------------------------------
 # check rmtypo datas, time 
 # -----------------------------------------------
 
 a = input('check sample datas percentage of null-written transmission times? (y/n)')
 
 if a == 'y' :
+
     df_date = pd.DataFrame(columns = ['excel', 'all_date', 'available', 'non-available', 'starting', 'ending'])
     num_date = 0
+
+    print(os.listdir(sample_time))
     
     num_all = len(os.listdir(sample_time))
     for num_excel, excel in enumerate(os.listdir(sample_time)) :
@@ -274,9 +302,9 @@ if a == 'y' :
 
         print(f'{num_excel} / {num_all}')
 
-print(df_date)
-os.chdir(sample_plot)
-df_date.to_excel('date_availability_forsampels.xlsx')
+    print(df_date)
+    os.chdir(sample_plot)
+    df_date.to_excel('date_availability_forsampels.xlsx')
 
 
 
