@@ -395,8 +395,7 @@ if a == 'y' :
 # make minutual - timedelta dataframe
     excepted = 0
 
-    num_list = [6, 12, 15, 18, 27]
-    num_list = [0]
+    num_list = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100]
 
     for excel_num, excel in enumerate(os.listdir(sample_avail)) :
         if excel_num in num_list :
@@ -413,8 +412,8 @@ if a == 'y' :
                                 if int(str(temp.loc[index - 1, '등록일자'])[8 : 10]) < 25 :
 
 
-                                    prev_real_date = date_to_datetime(temp.loc[index - 1, '등록일자'])
-                                    now_real_date = date_to_datetime(temp.loc[index, '등록일자'])
+                                    prev_real_date = date_to_datetime(str(temp.loc[index - 1, '등록일자']))
+                                    now_real_date = date_to_datetime(str(temp.loc[index, '등록일자']))
                                     temp_date = str(temp.loc[index, '등록일자'])[ : 10] + '00'
                                     
                                     print(prev_real_date)
@@ -441,6 +440,12 @@ if a == 'y' :
 # -----------------------------------------------
 # plot temperature information (barplot)
 # -----------------------------------------------
+
+a = input('plot ? (y/n)')
+
+if a == 'y' :
+    os.chdir(os.path.join(sample_plot, 'preprocessed', 'temperature'))
+    df.read_excel('time_interval.xlsx')
 
     fig = plt.figure(figsize = (14, 7))
 

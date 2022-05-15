@@ -284,7 +284,7 @@ a = input('check null and outliers?(y/n)')
 
 if a == 'y' :
     import outlier as out
-    target_info_list = ['풍속', '풍향', '기온', '상대습도', '초미세먼지', '미세먼지']
+    target_info_list = ['기온', '미세먼지', '초미세먼지', '상대습도']
 
     for target_info in target_info_list :
 
@@ -346,4 +346,37 @@ if a == 'y' :
         os.chdir(os.path.join(sample_plot, 'null_outliers_check'))
         df_outliers.to_excel(f'{target_info}_null_outliers_check.xlsx')
         print(df_outliers)
+
+
+a = input('remake temp format? (y/n)')
+
+if a == 'y' :
+    num_all = len(os.listdir(sample_only_time))
+    for num_excel, excel in enumerate(os.listdir(sample_only_time)) :
+        os.chdir(sample_only_time)
+        if num_excel > 246 :
+            temp = read_excel(excel)
+            if temp.shape[0] > 2 :
+                for index in range(temp.shape[0]) :
+                    temper = str(temp.loc[index, '기온'])
+                    check = 0
+                    if '0-' in temper :
+                        ntemper = float(temper[temper.index('-') :])
+                        temp.loc[index, '기온'] = ntemper
+                        check = 1
+
+                    if ',' in temper :
+                        ntemper = float(temper.replace(',', '') )
+                        temp.loc[index, '기온'] = ntemper
+                        check = 1
+                    
+                    if check == 0 :
+                        temp.loc[index, '기온'] = float(temper)
+
+
+
+
+            os.chdir(sample_only_time)
+            temp.to_excel(excel)
+            print(f'{num_excel + 1} / {num_all}\t{round(((num_excel + 1) / num_all) * 100, 2)}%')
 

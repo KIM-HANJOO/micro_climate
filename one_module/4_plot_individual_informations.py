@@ -252,6 +252,44 @@ self_module = os.path.join(module_dir, 'self_module')
 info_dir = os.path.join(main_dir, 'info_data')
 
 
+#   < new directory paths >
+samples_module_dir = Path(os.getcwd())
+sample_robby = samples_module_dir.parent
+sample_data = os.path.join(sample_robby, 'preprocessed', 'merged')
+sample_info = os.path.join(sample_robby, 'preprocessed', 'info')
+sample_plot = os.path.join(sample_robby, 'preprocessed', 'plot')
+sample_typo = os.path.join(sample_robby, 'preprocessed', 'typo')
+sample_time = os.path.join(sample_robby, 'preprocessed', 'time')
+sample_only_time = os.path.join(sample_robby, 'preprocessed', 'only_available_time')
+sample_avail = sample_only_time
+
+main_dir = sample_robby#.parent
+module_dir = os.path.join(main_dir, 'module')
+
+datas_dir = os.path.join(main_dir, 'datas')
+self_module = os.path.join(module_dir, 'self_module')
+info_dir = os.path.join(main_dir, 'info_data')
+
+
+#   add dirs to sys.path
+
+sys.path.append(module_dir)
+sys.path.append(self_module)
+
+#   import self packages
+
+import directory_change as dich
+import discordlib_pyplot as dlt
+
+
+dich.newfolder(sample_data)
+dich.newfolder(sample_info)
+dich.newfolder(sample_plot)
+dich.newfolder(sample_typo)
+dich.newfolder(sample_time)
+dich.newfolder(sample_only_time)
+
+
 # -----------------------------------------------
 # define function to link dates
 # -----------------------------------------------
@@ -305,7 +343,7 @@ df_num = 0
 for excel_num, excel in enumerate(os.listdir(sample_avail)) :
     os.chdir(sample_avail)
     temp = read_excel(excel)
-    if (temp.shape[0] != 0) :
+    if (temp.shape[0] > 5) :
         #print(temp.columns)
         #print(temp.loc[: , ['등록일자', '기온']])
 
@@ -316,10 +354,22 @@ for excel_num, excel in enumerate(os.listdir(sample_avail)) :
             if temp_date in date_dict.keys() :
                 temp_num = date_dict[temp_date]
 
-            temp_temp = float(str(temp.loc[index,'기온']).replace(',', ''))
-            temp_wa = float(temp.loc[index, '풍향'])
-            temp_ws = float(temp.loc[index, '풍속'])
-            temp_fd = float(temp.loc[index, '미세먼지'])
+
+            temp_temp = -15
+            temp_wa = -1
+            temp_ws = -1
+            temp_fd = 'nan'
+
+            if not pd.isna(temp.loc[index,'기온']) :
+                temp_temp = float(str(temp.loc[index,'기온']).replace(',', ''))
+            if not pd.isna(temp.loc[index,'풍향']) :
+                temp_wa = float(temp.loc[index, '풍향'])
+            if not pd.isna(temp.loc[index,'풍속']) :
+                temp_ws = float(temp.loc[index, '풍속'])
+            if not pd.isna(temp.loc[index,'미세먼지']) :
+                temp_fd = float(temp.loc[index, '미세먼지'])
+
+            check = 0
 
             if (temp_temp > -15) & (temp_temp < 50) :
                 if (temp_wa > -1) & (temp_wa < 361) :

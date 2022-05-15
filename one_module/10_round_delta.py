@@ -20,6 +20,44 @@ self_module = os.path.join(module_dir, 'self_module')
 info_dir = os.path.join(main_dir, 'info_data')
 
 
+#   < new directory paths >
+samples_module_dir = Path(os.getcwd())
+sample_robby = samples_module_dir.parent
+sample_data = os.path.join(sample_robby, 'preprocessed', 'merged')
+sample_info = os.path.join(sample_robby, 'preprocessed', 'info')
+sample_plot = os.path.join(sample_robby, 'preprocessed', 'plot')
+sample_typo = os.path.join(sample_robby, 'preprocessed', 'typo')
+sample_time = os.path.join(sample_robby, 'preprocessed', 'time')
+sample_only_time = os.path.join(sample_robby, 'preprocessed', 'only_available_time')
+sample_avail = sample_only_time
+
+main_dir = sample_robby#.parent
+module_dir = os.path.join(main_dir, 'module')
+
+datas_dir = os.path.join(main_dir, 'datas')
+self_module = os.path.join(module_dir, 'self_module')
+info_dir = os.path.join(main_dir, 'info_data')
+
+
+#   add dirs to sys.path
+
+sys.path.append(module_dir)
+sys.path.append(self_module)
+
+#   import self packages
+
+import directory_change as dich
+import discordlib_pyplot as dlt
+
+
+dich.newfolder(sample_data)
+dich.newfolder(sample_info)
+dich.newfolder(sample_plot)
+dich.newfolder(sample_typo)
+dich.newfolder(sample_time)
+dich.newfolder(sample_only_time)
+
+
 #   add dirs to sys.path
 
 sys.path.append(module_dir)
@@ -124,6 +162,45 @@ self_module = os.path.join(module_dir, 'self_module')
 info_dir = os.path.join(main_dir, 'info_data')
 
 
+#   < new directory paths >
+samples_module_dir = Path(os.getcwd())
+sample_robby = samples_module_dir.parent
+sample_data = os.path.join(sample_robby, 'preprocessed', 'merged')
+sample_info = os.path.join(sample_robby, 'preprocessed', 'info')
+sample_plot = os.path.join(sample_robby, 'preprocessed', 'plot')
+sample_typo = os.path.join(sample_robby, 'preprocessed', 'typo')
+sample_time = os.path.join(sample_robby, 'preprocessed', 'time')
+sample_only_time = os.path.join(sample_robby, 'preprocessed', 'only_available_time')
+sample_avail = sample_only_time
+
+main_dir = sample_robby#.parent
+module_dir = os.path.join(main_dir, 'module')
+
+datas_dir = os.path.join(main_dir, 'datas')
+self_module = os.path.join(module_dir, 'self_module')
+info_dir = os.path.join(main_dir, 'info_data')
+
+
+#   add dirs to sys.path
+
+sys.path.append(module_dir)
+sys.path.append(self_module)
+
+#   import self packages
+
+import directory_change as dich
+import discordlib_pyplot as dlt
+
+
+dich.newfolder(sample_data)
+dich.newfolder(sample_info)
+dich.newfolder(sample_plot)
+dich.newfolder(sample_typo)
+dich.newfolder(sample_time)
+dich.newfolder(sample_only_time)
+
+
+
 # -----------------------------------------------
 # define function to link dates
 # -----------------------------------------------
@@ -205,6 +282,7 @@ def interval_from_df(data) :
     for index in range(data.shape[0]) :
         if str(data.loc[index, '등록일자']) != 'nan' :
             index_number.append(index)
+            
             index_values.append(data.loc[index, '보정_시간'])
             index_check.append(asc)
             asc += 1
@@ -296,6 +374,45 @@ def round_hour(dt) :
     else :
         return datetime.datetime(year = year, month = month, day = day, hour = hour + 1)
 
+
+#   < new directory paths >
+samples_module_dir = Path(os.getcwd())
+sample_robby = samples_module_dir.parent
+sample_data = os.path.join(sample_robby, 'preprocessed', 'merged')
+sample_info = os.path.join(sample_robby, 'preprocessed', 'info')
+sample_plot = os.path.join(sample_robby, 'preprocessed', 'plot')
+sample_typo = os.path.join(sample_robby, 'preprocessed', 'typo')
+sample_time = os.path.join(sample_robby, 'preprocessed', 'time')
+sample_only_time = os.path.join(sample_robby, 'preprocessed', 'only_available_time')
+sample_avail = sample_only_time
+sample_round = os.path.join(sample_robby, 'preprocessed', 'rounded')
+
+main_dir = sample_robby#.parent
+module_dir = os.path.join(main_dir, 'module')
+
+datas_dir = os.path.join(main_dir, 'datas')
+self_module = os.path.join(module_dir, 'self_module')
+info_dir = os.path.join(main_dir, 'info_data')
+
+
+#   add dirs to sys.path
+
+sys.path.append(module_dir)
+sys.path.append(self_module)
+
+#   import self packages
+
+import directory_change as dich
+import discordlib_pyplot as dlt
+
+
+dich.newfolder(sample_data)
+dich.newfolder(sample_info)
+dich.newfolder(sample_plot)
+dich.newfolder(sample_typo)
+dich.newfolder(sample_time)
+dich.newfolder(sample_only_time)
+
 # -----------------------------------------------
 # make date list and date_dict, inverse_dict
 # -----------------------------------------------
@@ -311,7 +428,7 @@ if a == 'y' :
         for index in range(temp.shape[0]) :
             if not check_avail(temp.loc[index, '등록일자']) :
                 print(f"{excel}\t{index}\t{temp.loc[index, '등록일자']}")
-        print(f'{excel_num + 1} / 32')
+        print(f'{excel_num + 1} / {len(os.listdir(sample_avail))}')
 
 
 
@@ -327,42 +444,51 @@ if a == 'y' :
     sample_list = []
 
     for excel_num, excel in enumerate(os.listdir(sample_avail)) :
-        if excel_num < 1 :
+        if excel_num < 10 :
             os.chdir(sample_avail)
             temp = read_excel(excel)
             
-            for index in range(temp.shape[0]) :
-                if str(temp.loc[index, '등록일자']) != 'nan' :
-                    start_date = temp.loc[index, '등록일자']
-                    start_date = round_hour(start_date)
-                    break
+            if '보정_시간' in temp.columns :
+                pass
+            else :
+                print(f'{excel_num}_____{excel}____{len(temp.columns)}')
             
-            start_number = -1
-            start_date = datetime_to_date(start_date)
-            for number, date in enumerate(real_date_list) :
-                if str(start_date) == str(date) :
-                    start_number = number
-                    break
-            
+            if temp.shape[0]  > 2 :
+                if '보정_시간' in temp.columns :
+                    for index in range(temp.shape[0]) :
+                        if str(temp.loc[index, '등록일자']) != 'nan' :
+                            start_date = temp.loc[index, '등록일자']
+                            start_date = round_hour(start_date)
+                            break
+                    
+                    start_number = -1
+                    start_date = datetime_to_date(start_date)
+                    for number, date in enumerate(real_date_list) :
+                        if str(start_date) == str(date) :
+                            start_number = number
+                            break
+                    
 #        if start_number == -1 :
 #            print('%%%\n' * 1000)
-                    
+                            
 
-            interval = interval_from_df(temp)
-            interval_start = 0
+                    print(excel_num, '\t', temp.shape)
+                    print('***' * 3)
+                    interval = interval_from_df(temp)
+                    interval_start = 0
 
-            for col in interval_all :
-                if int(col) < start_number :
-                    interval_all.loc[excel_num, col] = -1
-                else :
-                    if interval_start < len(interval) :
-                        interval_all.loc[excel_num, col] = interval[interval_start]
-                        interval_start += 1
-                    else :
-                        interval_all.loc[excel_num ,col] = -1
+                    for col in interval_all :
+                        if int(col) < start_number :
+                            interval_all.loc[excel_num, col] = -1
+                        else :
+                            if interval_start < len(interval) :
+                                interval_all.loc[excel_num, col] = interval[interval_start]
+                                interval_start += 1
+                            else :
+                                interval_all.loc[excel_num ,col] = -1
 
-            print(excel_num)
-            print(interval_all)
+                    print(excel_num)
+                    print(interval_all)
 
 
 # -----------------------------------------------
@@ -370,6 +496,7 @@ if a == 'y' :
 # -----------------------------------------------
 
     
+    print(interval_all)
     fig = plt.figure(figsize = (14, 7))
 
     interval_col = interval_all.columns.astype(int)
