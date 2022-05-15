@@ -35,9 +35,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import font_manager, rc
-font_path = "/mnt/c/Users/joo09/Documents/Github/fonts/D2Coding.ttf"
-font = font_manager.FontProperties(fname = font_path).get_name()
-rc('font', family = font)
+#font_path = "/mnt/c/Users/joo09/Documents/Github/fonts/D2Coding.ttf"
+#font = font_manager.FontProperties(fname = font_path).get_name()
+#rc('font', family = font)
+
+
+rc('font', family='AppleGothic')
+plt.rcParams['axes.unicode_minus'] = False
 
 import glob
 import math
@@ -354,7 +358,331 @@ def get_day(df, day) :
 
     return target_df
 
+# -----------------------------------------------
+# make date list and date_dict, inverse_dict
+# -----------------------------------------------
+
+# date from 2020.04.01 to 2021.12.31
+date_dict, inverse_dict, real_date_list = all_date()
+
+
+def round_hour(dt) :
+    # convert string (202004010100) to datetime format
+    dt = date_to_datetime(dt)
+
+    # split datetime
+    year = dt.year
+    month = dt.month
+    day = dt.day
+
+    hour = dt.hour
+    minute = dt.minute
+
+
+    # ruturn rounded datetime
+    if dt.minute < 30 :
+        return datetime.datetime(year = year, month = month, day = day, hour = hour)
+
+    else :
+        return datetime.datetime(year = year, month = month, day = day, hour = hour + 1)
 
 # -----------------------------------------------
 # actual data availability 
 # -----------------------------------------------
+
+
+sample_plot_data = os.path.join(sample_plot, 'data_basics')
+dich.newfolder(sample_plot_data)
+
+a = input('plot missing days? (y/n)')
+
+if a == 'y' :
+
+    sample_plot_data = os.path.join(sample_plot, 'data_basics')
+    dich.newfolder(sample_plot_data)
+
+    os.chdir(sample_plot)
+    data_ava = read_excel('date_availability_forsampels.xlsx')
+
+    for index in range(data_ava.shape[0]) :
+        data_ava.loc[index, 'starting'] = str(int(data_ava.loc[index, 'starting']))
+        data_ava.loc[index, 'ending'] = str(int(data_ava.loc[index, 'ending']))
+
+
+    print(data_ava)
+
+    fig = plt.figure(figsize = (10, 6))
+    ys, xs, patches = plt.hist(data_ava.loc[:, 'non-available'].tolist(), label = 'missing days', bins = 200)
+
+    for i in range(len(ys)) :
+        if ys[i] != 0 :
+            if i == 0 :
+                x_position = 0.1
+            else :
+                x_position =  -20
+
+            plt.text(x = xs[i] + x_position, y = ys[i] + 0.1,
+                    s = f'{int(ys[i])}', color = 'red')
+
+    plt.title('missing days\n1107 stations')
+    plt.xlim(0, 2000)
+    plt.xlabel('missing days')
+    plt.ylabel('number')
+    plt.grid()
+    os.chdir(sample_plot_data)
+    plt.savefig('missing_days.png', dpi = 400)
+
+
+a = input('plot actual days (y/n)')
+
+if a == 'y' :
+
+    start_date = date_to_datetime('202004010000')
+    end_date = date_to_datetime('202112312300')
+    
+    dur = end_date - start_date
+
+    end_timestep = dur.days * 24 + dur.seconds // 3600
+
+    xticks = []
+    xticks_datetime = []
+
+    for timestep in range(end_timestep) :
+        if timestep % 500 == 0 :
+            xticks.append(timestep)
+            date_string = datetime_to_date(start_date + datetime.timedelta(hours = timestep))
+
+            ndate = date_string[ : 4] + '/ ' + date_string[4 : 6] + '/ ' + date_string[6 : 8]
+
+            xticks_datetime.append(ndate)
+
+
+
+    fig = plt.figure(figsize = (14, 7))
+
+    for num_excel, excel in enumerate(os.listdir(sample_rounded)) :
+        if num_excel < 5 :
+            os.chdir(sample_rounded)
+            temp = read_excel(excel)
+
+
+            ahour_list = []
+            for index in range(temp.shape[0]) :
+                if temp.loc[index, 'hour_available'] == 'O' :
+                    time_gap = (date_to_datetime(temp.loc[index, '보정_시간']) - start_date)
+#                    print(time_gap.days * 24)
+#                    print(time_gap.seconds // 3600)
+
+                    ahour_list.append(time_gap.days * 24 + time_gap.seconds // 3600)
+
+            #print(ahour_list)
+
+            for num_item, item in enumerate(ahour_list) :
+                plt.plot([item, item + 1], [num_excel, num_excel], linewidth = 10)
+
+            print(num_excel)
+
+    plt.xticks(xticks, xticks_datetime, rotation = 90)
+    plt.title('available hours for each stations')
+    plt.ylabel('stations')
+
+    sample_plot_data = os.path.join(sample_plot, 'data_basics')
+    dich.newfolder(sample_plot_data)
+    os.chdir(sample_plot_data)
+    plt.savefig('available_time_in_timesteps.png', dpi = 400)
+
+
+
+
+
+a = input('plot individual informations (y/n)')
+
+if a == 'y' :
+    zoom_plot = os.path.join(sample_plot_data, 'zoom_plot')
+    dich.newfolder(zoom_plot)
+    summer_hours = []
+    winter_hours = []
+
+    summer_day = '20210621'
+    winter_day = '20211222'
+
+    for hour in range(24) :
+        hour_str = double_size(str(hour))
+        summer_hours.append(f'{summer_day}{hour_str}00')
+        winter_hours.append(f'{winter_day}{hour_str}00')
+
+
+    print(summer_hours)
+    print(winter_hours)
+
+
+
+    target_info = ['기온', '풍속', '미세먼지']
+    target_info = ['풍속', '미세먼지']
+
+
+    for target in target_info :
+        summer_df = None
+        winter_df = None
+        summer_df = pd.DataFrame(index = summer_hours)
+        winter_df = pd.DataFrame(index = winter_hours)
+        for num_excel, excel in enumerate(os.listdir(sample_rounded)) :
+            
+            # read excel
+            os.chdir(sample_rounded)
+            target_col = ['기온', '미세먼지', '풍향', '풍속', '보정_시간', 'hour_available']
+            print(excel)
+            print('###' * 3)
+            df = read_excel(excel)[target_col]
+            df.sort_values(by = ['보정_시간'], inplace = True)
+
+
+            # pull summer / winter days
+            summer_index = []
+            winter_index = []
+            for num_index, index in enumerate(range(df.shape[0])) :
+                
+                if str(df.loc[index, '보정_시간'])[ : 8] == summer_day :
+                    summer_index.append(index)
+
+                if str(df.loc[index, '보정_시간'])[ : 8] == winter_day :
+                    winter_index.append(index)
+
+            summer_temp = df.loc[summer_index, : ]
+            winter_temp = df.loc[winter_index, : ]
+
+            summer_avail = summer_temp[summer_temp['hour_available'] == 'O']
+            winter_avail = winter_temp[winter_temp['hour_available'] == 'O']
+
+            summer_avail.reset_index(drop = True, inplace = True)
+            winter_avail.reset_index(drop = True, inplace = True)
+
+            for index in range(summer_avail.shape[0]) :
+                print(summer_avail.loc[index, '보정_시간'])
+                summer_df.loc[str(summer_avail.loc[index, '보정_시간']), excel] = str(summer_avail.loc[index, target])
+
+
+            for index in range(winter_avail.shape[0]) :
+                winter_df.loc[str(winter_avail.loc[index, '보정_시간']), excel] = str(winter_avail.loc[index, target])
+
+            print(f'{target}\t{num_excel}\t{excel}')
+
+
+        # save dataframe
+        os.chdir(zoom_plot)
+
+        summer_df.to_excel(f'{target}_summer_df.xlsx')
+        winter_df.to_excel(f'{target}_winter_df.xlsx')
+
+        # load dataframe
+
+        os.chdir(zoom_plot)
+
+        summer_df = read_excel(f'{target}_summer_df.xlsx')
+        winter_df = read_excel(f'{target}_winter_df.xlsx')
+
+
+        print(summer_df)
+        print(winter_df)
+
+        print(summer_df.shape)
+        print(winter_df.shape)
+
+        # plot graphs
+
+        fig = plt.figure(figsize = (14, 15))
+
+        ax1 = fig.add_subplot(2, 1, 1)
+        ax2 = fig.add_subplot(2, 1, 2)
+
+        boxprops = dict(linewidth = 2, color = 'firebrick')
+
+        xticks = []
+        for num_index, index in enumerate(summer_df.index) :
+            summer_box = [int(x) for x in summer_df.loc[index, :].tolist() if str(x) != 'nan']
+
+            ax1.boxplot(summer_box, boxprops = boxprops, positions = [num_index + 1])
+            xticks.append(num_index + 1)
+
+        for num_index, index in enumerate(winter_df.index) :
+            winter_box = [int(x) for x in winter_df.loc[index, :].tolist() if str(x) != 'nan']
+            ax2.boxplot(winter_box, boxprops = boxprops, positions = [num_index + 1])
+
+        # set tick labels
+        xticks = []
+        for hour in range(24) :
+            xticks.append(double_size(str(hour)))
+
+
+
+        ax1.set_xticklabels(xticks, rotation = 0)
+        ax2.set_xticklabels(xticks, rotation = 0)
+
+
+        if target == '기온' :
+            ax1.set_ylim(-5, 33)
+            ax2.set_ylim(-5, 33)
+        elif target == '미세먼지' :
+            pass
+#        ax1.set_ylim(10, 120)
+#        ax2.set_ylim(10, 120)
+
+        ax1.set_title('2021/ 06/ 21')
+        ax2.set_title('2021/ 12/ 22')
+
+        os.chdir(zoom_plot)
+        plt.savefig(f'{target}_summer_winter.png', dpi = 400)
+        dlt.savefig(zoom_plot, f'{target}_summer_winter.png', 400)
+
+        plt.clf
+
+
+        # plot no_zoomed graph
+
+        fig = plt.figure(figsize = (14, 15))
+
+        ax1 = fig.add_subplot(2, 1, 1)
+        ax2 = fig.add_subplot(2, 1, 2)
+
+        boxprops = dict(linewidth = 2, color = 'firebrick')
+
+        xticks = []
+        for num_index, index in enumerate(summer_df.index) :
+            summer_box = [int(x) for x in summer_df.loc[index, :].tolist() if str(x) != 'nan']
+
+            ax1.boxplot(summer_box, boxprops = boxprops, positions = [num_index + 1])
+            xticks.append(num_index + 1)
+
+        for num_index, index in enumerate(winter_df.index) :
+            winter_box = [int(x) for x in winter_df.loc[index, :].tolist() if str(x) != 'nan']
+            ax2.boxplot(winter_box, boxprops = boxprops, positions = [num_index + 1])
+
+        # set tick labels
+        xticks = []
+        for hour in range(24) :
+            xticks.append(double_size(str(hour)))
+
+
+
+        ax1.set_xticklabels(xticks, rotation = 0)
+        ax2.set_xticklabels(xticks, rotation = 0)
+
+        ax1.set_title(f'{target}\n2021/ 06/ 21')
+        ax2.set_title(f'{target}\n2021/ 12/ 22')
+
+        ax1.xlabel('hour')
+        ax1.ylabel(f'{target}')
+
+        ax2.xlabel('hour')
+        ax2.ylabel(f'{target}')
+
+        os.chdir(zoom_plot)
+        plt.savefig(f'{target}_summer_winter_zoomed.png', dpi = 400)
+        dlt.savefig(zoom_plot, f'{target}_summer_winter_zoomed.png', 400)
+
+        plt.clf
+
+
+
+#
+

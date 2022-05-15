@@ -35,9 +35,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import font_manager, rc
-font_path = "/mnt/c/Users/joo09/Documents/Github/fonts/D2Coding.ttf"
-font = font_manager.FontProperties(fname = font_path).get_name()
-rc('font', family = font)
+#font_path = "/mnt/c/Users/joo09/Documents/Github/fonts/D2Coding.ttf"
+#font = font_manager.FontProperties(fname = font_path).get_name()
+#rc('font', family = font)
+
+rc('font', family='AppleGothic')
+plt.rcParams['axes.unicode_minus'] = False
 
 import glob
 import math

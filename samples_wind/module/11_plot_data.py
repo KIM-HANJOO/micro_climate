@@ -498,14 +498,14 @@ summer_df = pd.DataFrame(index = summer_hours)
 winter_df = pd.DataFrame(index = winter_hours)
 
 
-target_info = ['기온', '상대습도']
+target_info = ['기온', '풍속', '미세먼지']
 
 for target in target_info :
     for num_excel, excel in enumerate(os.listdir(rounded_dir)) :
         
         # read excel
         os.chdir(rounded_dir)
-        target_col = ['기온', '상대습도', '풍향', '풍속', '보정_시간', 'hour_available']
+        target_col = ['기온', '미세먼지', '풍향', '풍속', '보정_시간', 'hour_available']
         df = read_excel(excel)[target_col]
         df.sort_values(by = ['보정_시간'], inplace = True)
 
@@ -594,9 +594,10 @@ for target in target_info :
     if target == '기온' :
         ax1.set_ylim(-5, 33)
         ax2.set_ylim(-5, 33)
-    elif target == '상대습도' :
-        ax1.set_ylim(10, 120)
-        ax2.set_ylim(10, 120)
+    elif target == '미세먼지' :
+        pass
+#        ax1.set_ylim(10, 120)
+#        ax2.set_ylim(10, 120)
 
     ax1.set_title('2021/ 06/ 21')
     ax2.set_title('2021/ 12/ 22')
