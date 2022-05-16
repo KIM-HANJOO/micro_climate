@@ -354,7 +354,7 @@ if a == 'y' :
     num_all = len(os.listdir(sample_only_time))
     for num_excel, excel in enumerate(os.listdir(sample_only_time)) :
         os.chdir(sample_only_time)
-        if num_excel > 246 :
+        if num_excel > 493 :
             temp = read_excel(excel)
             if temp.shape[0] > 2 :
                 for index in range(temp.shape[0]) :
@@ -369,9 +369,16 @@ if a == 'y' :
                         ntemper = float(temper.replace(',', '') )
                         temp.loc[index, '기온'] = ntemper
                         check = 1
-                    
+
                     if check == 0 :
-                        temp.loc[index, '기온'] = float(temper)
+                        if temper.replace(' ', '') == '-' :
+                            temp.loc[index, '기온'] = np.nan
+
+                        elif temper.replace(' ', '')  == 'NA' :
+                            temp.loc[index, '기온'] = np.nan
+
+                        else :
+                            temp.loc[index, '기온'] = float(temper)
 
 
 

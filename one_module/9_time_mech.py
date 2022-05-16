@@ -478,7 +478,7 @@ if a == 'y' :
     df_num = 0
 
     for excel_num, excel in enumerate(os.listdir(sample_avail)) :
-        if excel_num > -1:
+        if excel_num > 613:
             os.chdir(sample_avail)
             temp = read_excel(excel)
             total_size = temp.shape[0]

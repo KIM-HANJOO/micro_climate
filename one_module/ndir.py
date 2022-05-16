@@ -9,6 +9,8 @@ sample_time = os.path.join(sample_robby, 'preprocessed', 'time')
 sample_only_time = os.path.join(sample_robby, 'preprocessed', 'only_available_time')
 sample_avail = sample_only_time
 sample_round = os.path.join(sample_robby, 'preprocessed', 'rounded')
+sample_rounded = sample_rounded
+
 
 main_dir = sample_robby#.parent
 module_dir = os.path.join(main_dir, 'module')

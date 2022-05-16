@@ -74,13 +74,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import font_manager, rc
-#font_path = "/mnt/c/Users/joo09/Documents/Github/fonts/D2Coding.ttf"
-#font = font_manager.FontProperties(fname = font_path).get_name()
-#rc('font', family = font)
+font_path = "/mnt/c/Users/joo09/Documents/Github/fonts/D2Coding.ttf"
+font = font_manager.FontProperties(fname = font_path).get_name()
+rc('font', family = font)
 
 
-rc('font', family='AppleGothic')
-plt.rcParams['axes.unicode_minus'] = False
+#rc('font', family='AppleGothic')
+#plt.rcParams['axes.unicode_minus'] = False
 
 import glob
 import math
@@ -179,6 +179,7 @@ sample_time = os.path.join(sample_robby, 'preprocessed', 'time')
 sample_only_time = os.path.join(sample_robby, 'preprocessed', 'only_available_time')
 sample_avail = sample_only_time
 sample_round = os.path.join(sample_robby, 'preprocessed', 'rounded')
+sample_rounded = sample_round
 
 main_dir = sample_robby#.parent
 module_dir = os.path.join(main_dir, 'module')
@@ -511,6 +512,34 @@ if a == 'y' :
     plt.savefig('missing_days.png', dpi = 400)
 
 
+
+
+a = input('time interval shown (y/n)')
+
+if a == 'y' :
+    temp_dir = os.path.join(sample_plot, 'preprocessed', 'temperature')
+    os.chdir(temp_dir)
+    temp = read_excel('time_interval.xlsx')
+    target_index = list(range(2, 10))
+    temp = temp.loc[target_index, :]
+    temp.reset_index(drop = True, inplace = True)
+
+
+    fig = plt.figure(figsize = (14, 7))
+
+    for num_col, col in enumerate(temp.columns) :
+        if col != 'excel' :
+            plt.boxplot(temp.loc[:, col].tolist(), positions = [num_col])
+            print(f'{col} shown')
+
+    plt.title('minute_interval\nall sample stations')
+
+    plt.savefig('timedelta_minute.png', dpi = 400)
+
+            
+
+
+
 a = input('plot actual days (y/n)')
 
 if a == 'y' :
@@ -538,8 +567,9 @@ if a == 'y' :
 
     fig = plt.figure(figsize = (14, 7))
 
+    excel_choice = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1150]
     for num_excel, excel in enumerate(os.listdir(sample_rounded)) :
-        if num_excel < 5 :
+        if num_excel in excel_choice :
             os.chdir(sample_rounded)
             temp = read_excel(excel)
 
