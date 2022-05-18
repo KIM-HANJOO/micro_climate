@@ -74,13 +74,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import font_manager, rc
-font_path = "/mnt/c/Users/joo09/Documents/Github/fonts/D2Coding.ttf"
-font = font_manager.FontProperties(fname = font_path).get_name()
-rc('font', family = font)
+#font_path = "/mnt/c/Users/joo09/Documents/Github/fonts/D2Coding.ttf"
+#font = font_manager.FontProperties(fname = font_path).get_name()
+#rc('font', family = font)
 
 
-#rc('font', family='AppleGothic')
-#plt.rcParams['axes.unicode_minus'] = False
+rc('font', family='AppleGothic')
+plt.rcParams['axes.unicode_minus'] = False
 
 import glob
 import math
@@ -625,8 +625,8 @@ if a == 'y' :
 
 
 
-    target_info = ['기온', '풍속', '미세먼지']
-    target_info = ['풍속', '미세먼지']
+    target_info = ['기온', '미세먼지']
+    #target_info = ['풍속', '미세먼지']
 
 
     for target in target_info :
@@ -635,45 +635,56 @@ if a == 'y' :
         summer_df = pd.DataFrame(index = summer_hours)
         winter_df = pd.DataFrame(index = winter_hours)
         for num_excel, excel in enumerate(os.listdir(sample_rounded)) :
-            
-            # read excel
-            os.chdir(sample_rounded)
-            target_col = ['기온', '미세먼지', '풍향', '풍속', '보정_시간', 'hour_available']
-            print(excel)
-            print('###' * 3)
-            df = read_excel(excel)[target_col]
-            df.sort_values(by = ['보정_시간'], inplace = True)
-
-
-            # pull summer / winter days
-            summer_index = []
-            winter_index = []
-            for num_index, index in enumerate(range(df.shape[0])) :
+            if num_excel > -1:
                 
-                if str(df.loc[index, '보정_시간'])[ : 8] == summer_day :
-                    summer_index.append(index)
+                # read excel
+                os.chdir(sample_rounded)
+                target_col = ['기온', '미세먼지', '풍향', '풍속', '보정_시간', 'hour_available']
+                print(excel)
+                print('###' * 3)
+                df = read_excel(excel)
+                
+                check = 0
+                for target_item in target_col :
+                    if target_item not in df.columns :
+                        check = 1
 
-                if str(df.loc[index, '보정_시간'])[ : 8] == winter_day :
-                    winter_index.append(index)
-
-            summer_temp = df.loc[summer_index, : ]
-            winter_temp = df.loc[winter_index, : ]
-
-            summer_avail = summer_temp[summer_temp['hour_available'] == 'O']
-            winter_avail = winter_temp[winter_temp['hour_available'] == 'O']
-
-            summer_avail.reset_index(drop = True, inplace = True)
-            winter_avail.reset_index(drop = True, inplace = True)
-
-            for index in range(summer_avail.shape[0]) :
-                print(summer_avail.loc[index, '보정_시간'])
-                summer_df.loc[str(summer_avail.loc[index, '보정_시간']), excel] = str(summer_avail.loc[index, target])
+                if check == 0 :
+                    df = df[target_col]
+                    df.sort_values(by = ['보정_시간'], inplace = True)
 
 
-            for index in range(winter_avail.shape[0]) :
-                winter_df.loc[str(winter_avail.loc[index, '보정_시간']), excel] = str(winter_avail.loc[index, target])
+                    # pull summer / winter days
+                    summer_index = []
+                    winter_index = []
+                    for num_index, index in enumerate(range(df.shape[0])) :
+                        
+                        if str(df.loc[index, '보정_시간'])[ : 8] == summer_day :
+                            summer_index.append(index)
 
-            print(f'{target}\t{num_excel}\t{excel}')
+                        if str(df.loc[index, '보정_시간'])[ : 8] == winter_day :
+                            winter_index.append(index)
+
+                    summer_temp = df.loc[summer_index, : ]
+                    winter_temp = df.loc[winter_index, : ]
+
+                    summer_avail = summer_temp[summer_temp['hour_available'] == 'O']
+                    winter_avail = winter_temp[winter_temp['hour_available'] == 'O']
+
+                    summer_avail.reset_index(drop = True, inplace = True)
+                    winter_avail.reset_index(drop = True, inplace = True)
+
+                    for index in range(summer_avail.shape[0]) :
+                        print(summer_avail.loc[index, '보정_시간'])
+                        summer_df.loc[str(summer_avail.loc[index, '보정_시간']), excel] = str(summer_avail.loc[index, target])
+
+
+                    for index in range(winter_avail.shape[0]) :
+                        winter_df.loc[str(winter_avail.loc[index, '보정_시간']), excel] = str(winter_avail.loc[index, target])
+
+                    print(f'{target}\t{num_excel}\t{excel}')
+                else :
+                    print(f'not in _______ {target}\t{num_excel}\t{excel}')
 
 
         # save dataframe
@@ -685,6 +696,7 @@ if a == 'y' :
         # load dataframe
 
         os.chdir(zoom_plot)
+        print(zoom_plot)
 
         summer_df = read_excel(f'{target}_summer_df.xlsx')
         winter_df = read_excel(f'{target}_winter_df.xlsx')
@@ -707,7 +719,7 @@ if a == 'y' :
 
         xticks = []
         for num_index, index in enumerate(summer_df.index) :
-            summer_box = [int(x) for x in summer_df.loc[index, :].tolist() if str(x) != 'nan']
+            summer_box = [int(x) for x in summer_df.loc[index, :].tolist() if (str(x) != 'nan') & (str(x) != 'O')]
 
             ax1.boxplot(summer_box, boxprops = boxprops, positions = [num_index + 1])
             xticks.append(num_index + 1)
@@ -778,11 +790,11 @@ if a == 'y' :
         ax1.set_title(f'{target}\n2021/ 06/ 21')
         ax2.set_title(f'{target}\n2021/ 12/ 22')
 
-        ax1.xlabel('hour')
-        ax1.ylabel(f'{target}')
+        ax1.set_xlabel('hour')
+        ax1.set_ylabel(f'{target}')
 
-        ax2.xlabel('hour')
-        ax2.ylabel(f'{target}')
+        ax2.set_xlabel('hour')
+        ax2.set_ylabel(f'{target}')
 
         os.chdir(zoom_plot)
         plt.savefig(f'{target}_summer_winter_zoomed.png', dpi = 400)
